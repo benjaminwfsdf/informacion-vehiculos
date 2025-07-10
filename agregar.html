@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Agregar Vehículo</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+      background-color: #fefefe;
+    }
+
+    h1 {
+      background-color: #b30000;
+      color: white;
+      padding: 12px;
+      text-align: center;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      border: 1px solid #000;
+      padding: 10px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f0f0f0;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 6px;
+      font-size: 14px;
+      box-sizing: border-box;
+      text-transform: uppercase;
+    }
+
+    .boton-guardar {
+      margin-top: 20px;
+      background-color: #b30000;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .boton-guardar:hover {
+      background-color: #900;
+    }
+
+    .boton-volver {
+      display: block;
+      width: 100%;
+      margin-top: 30px;
+      padding: 12px;
+      font-size: 16px;
+      background-color: #b30000;
+      color: white;
+      border: none;
+      text-align: center;
+      text-decoration: none;
+      border-radius: 5px;
+    }
+
+    .boton-volver:hover {
+      background-color: #900000;
+    }
+
+    .barra-superior {
+      background-color: #000;
+      color: white;
+      text-align: center;
+      padding: 10px;
+      font-size: 18px;
+      font-weight: bold;
+      border-bottom: 2px solid #b30000;
+    }
+
+    .footer {
+      margin-top: 40px;
+      text-align: center;
+      font-size: 12px;
+      color: #000000;
+      padding: 10px;
+      border-top: 1px solid #ccc;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<script>
+  const CLAVE_CORRECTA = "informes@";
+
+  const ingreso = prompt("🔐 Ingresa la clave para acceder:");
+  if (ingreso !== CLAVE_CORRECTA) {
+    alert("❌ Clave incorrecta. Acceso denegado.");
+    window.location.href = "https://www.elsenordelosescaner.cl/"; // o muestra un mensaje local si prefieres
+  }
+</script>
+
+<body>
+
+<div class="barra-superior">WWW.ELSEÑORDELOSESCANER.CL</div>
+<h1>Agregar Vehículo</h1>
+
+<table>
+  <tr>
+    <th>Nombre del Dueño</th>
+    <th>Teléfono</th>
+    <th>Dirección</th>
+    <th>Marca</th>
+    <th>Modelo</th>
+    <th>Patente</th>
+  </tr>
+  <tr>
+    <td><input type="text" id="nombre"></td>
+    <td><input type="text" id="telefono" maxlength="14" value="+56 9 " oninput="formatearTelefono(this)"></td>
+    <td><input type="text" id="direccion"></td>
+    <td><input type="text" id="marca"></td>
+    <td><input type="text" id="modelo"></td>
+    <td><input type="text" id="patente"></td>
+  </tr>
+</table>
+
+<button class="boton-guardar" onclick="guardarVehiculo()">Guardar Vehículo</button>
+<a href="index.html" class="boton-volver">← Volver al Menú Principal</a>
+
+<script>
+  function formatearTelefono(input) {
+    const valor = input.value;
+
+    if (!valor.startsWith("+56 9 ")) {
+      input.value = "+56 9 ";
+      return;
+    }
+
+    let resto = valor.slice(6).replace(/\D/g, '').slice(0, 8);
+    input.value = "+56 9 " + resto;
+  }
+
+  function guardarVehiculo() {
+    const datos = {
+      nombre: document.getElementById('nombre').value.toUpperCase(),
+      telefono: "'" + document.getElementById('telefono').value, // AÑADIDO para evitar #ERROR!
+      direccion: document.getElementById('direccion').value.toUpperCase(),
+      marca: document.getElementById('marca').value.toUpperCase(),
+      modelo: document.getElementById('modelo').value.toUpperCase(),
+      patente: document.getElementById('patente').value.toUpperCase(),
+    };
+
+    for (const campo in datos) {
+      if (!datos[campo]) {
+        alert("⚠️ Debes completar todos los campos antes de guardar.");
+        return;
+      }
+    }
+
+    if (!/^\+56 9 \d{8}$/.test(datos.telefono.slice(1))) {
+      alert("⚠️ El número de teléfono debe tener exactamente 8 dígitos después de +56 9");
+      return;
+    }
+
+    fetch("https://script.google.com/macros/s/AKfycbwjTLX2i-Un946F0-J0RrpA8NbT55VtSJ6lzniy9LHLIXBH4VsJT64o83hzA9276RNYXQ/exec", {
+      method: "POST",
+      mode: "no-cors",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(datos)
+    }).then(() => {
+      alert("✅ Vehículo guardado con éxito.");
+      document.getElementById('nombre').value = "";
+      document.getElementById('telefono').value = "+56 9 ";
+      document.getElementById('direccion').value = "";
+      document.getElementById('marca').value = "";
+      document.getElementById('modelo').value = "";
+      document.getElementById('patente').value = "";
+    });
+  }
+</script>
+
+<footer class="footer">
+  © 2025 Benjamin González. Todos los derechos reservados.
+</footer>
+
+</body>
+</html>
