@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seguimiento de Vehículo</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f2f2f2;
+      margin: 0;
+      padding: 0;
+    }
+
+    .barra-superior {
+      background-color: #000;
+      color: white;
+      text-align: center;
+      padding: 14px;
+      font-size: 18px;
+      font-weight: bold;
+      border-bottom: 4px solid #b30000;
+      letter-spacing: 1px;
+    }
+
+    .logo {
+      display: block;
+      margin: 20px auto 10px;
+      max-width: 200px;
+    }
+
+    .contenedor {
+      max-width: 700px;
+      background: #fff;
+      margin: 30px auto;
+      padding: 30px 40px;
+      border-radius: 10px;
+      border: 2px solid #b30000;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      text-align: center;
+      color: #b30000;
+      margin-bottom: 30px;
+    }
+
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 15px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      margin-top: 6px;
+      box-sizing: border-box;
+      text-transform: uppercase;
+    }
+
+    button {
+      background-color: #b30000;
+      color: white;
+      border: none;
+      padding: 14px;
+      font-size: 16px;
+      margin-top: 30px;
+      width: 100%;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #900000;
+    }
+
+    .resultado {
+      margin-top: 30px;
+      padding: 20px;
+      background-color: #f9f9f9;
+      border-left: 5px solid #b30000;
+      border-radius: 6px;
+      font-size: 15px;
+      color: #222;
+    }
+
+    .resultado strong {
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .footer {
+      margin-top: 40px;
+      text-align: center;
+      font-size: 13px;
+      color: #000;
+      padding: 12px;
+      border-top: 1px solid #ccc;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="barra-superior">WWW.ELSEÑORDELOSESCANER.CL</div>
+  <img class="logo" src="img/logo-scanners.png" alt="Logo taller">
+
+  <div class="contenedor">
+    <h1>Modo Cliente</h1>
+    <label for="dato">Ingresa tu Patente o Teléfono:</label>
+    <input type="text" id="dato" placeholder="Ej: ABCD12 o +56912345678" maxlength="20" />
+
+    <button onclick="buscar()">Ver Estado de mi Vehículo</button>
+
+    <div id="resultado" class="resultado" style="display: none;"></div>
+  </div>
+
+  <div class="footer">
+    © 2025 El Señor de los Scanner. Todos los derechos reservados.
+  </div>
+
+  <script>
+    async function buscar() {
+      const valor = document.getElementById("dato").value.trim().toUpperCase();
+      const contenedor = document.getElementById("resultado");
+
+      if (!valor) {
+        alert("⚠️ Ingresa una patente o número.");
+        return;
+      }
+
+      try {
+        const resp = await fetch("https://script.google.com/macros/s/AKfycbxHCTNINXGSq-aPoNOKY3QUUX7urM1ipolcDUEb1cbrUU0zLyaQJj1esQUNmRHZO6NG4w/exec");
+        const datos = await resp.json();
+
+        const resultado = datos.find(item => {
+          const telefono = (item["Teléfono"] || "").replace(/\D/g, '');
+          const patente = (item["Patente"] || "").toUpperCase();
+          const valorNormalizado = valor.replace(/\D/g, '');
+
+          return patente === valor || telefono === valorNormalizado;
+        });
+
+        contenedor.style.display = "block";
+
+        if (resultado) {
+          contenedor.innerHTML = `
+            <strong>🚗 Patente:</strong> ${resultado["Patente"] || "-"}
+            <strong>📞 Teléfono:</strong> ${resultado["Teléfono"] || "-"}
+            <strong>💻 Tipo de Computadora:</strong> ${resultado["Tipo de Computadora"] || "-"}
+            <strong>🛠️ Trabajo:</strong> ${resultado["Descripción Trabajo"] || "-"}
+            <strong>⚠️ Códigos:</strong> ${resultado["Códigos de avería"] || "-"}
+          `;
+        } else {
+          contenedor.innerHTML = `<strong style="color:red;">❌ No se encontró información para ese dato.</strong>`;
+        }
+
+      } catch (error) {
+        console.error(error);
+        alert("❌ Error al conectar con el sistema.");
+      }
+    }
+  </script>
+
+</body>
+</html>
